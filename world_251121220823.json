@@ -1,1 +1,30 @@
-
+{
+  "seed": 251121220823,
+  "name": "GREYBRIGHT OS v13 – The Eternal Door",
+  "player": {
+    "name": "Arcturus",
+    "location": "Caer Dhu Battlements",
+    "stats": {"hp": 100, "str": 10, "gold": 5},
+    "inventory": ["rusted sword", "leather cloak"]
+  },
+  "locations": {
+    "Caer Dhu Battlements": {
+      "description": "Cold stone under a blood-red moon. Rain lashes the ruins. A torch flickers ahead.",
+      "npcs": ["shadowy figure"],
+      "visited": true
+    },
+    "Town Square": {
+      "description": "Cobblestones slick with mist. Garrick the Wanderer mutters about the old war—missing two fingers, as always.",
+      "npcs": ["Garrick the Wanderer"],
+      "visited": false
+    }
+  },
+  "characters": {
+    "Garrick the Wanderer": {
+      "description": "Old man, ragged cloak, mutters about the war. Missing two fingers on left hand.",
+      "stats": {"loyalty": 50, "secrets_known": 1},
+      "gear": ["beggar's staff"]
+  },
+  "turn_count": 0,
+  "story_summary": "You awaken in the ruins of Caer Dhu, a fallen fortress on the edge of Ironspire. Whispers of ancient curses linger in the wind."
+}
