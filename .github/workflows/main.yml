@@ -1,0 +1,36 @@
+name: Merge World Files
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  merge_world:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install --upgrade pip
+
+      - name: Merge world-state files
+        run: |
+          python merge_world.py
+
+      - name: Commit merged world file
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add merged_world.json
+          git commit -m "Update merged world state" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
