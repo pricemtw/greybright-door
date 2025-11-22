@@ -1,0 +1,77 @@
+name: Play GREYBRIGHT DOOR (pure GitHub)
+
+on:
+  workflow_dispatch:
+    inputs:
+      player_action:
+        description: 'Your action (e.g., "I approach the torch")'
+        required: true
+        default: 'Look around'
+      player_name:
+        description: 'Your character name'
+        required: false
+        default: 'Arcturus'
+
+jobs:
+  play-turn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # For commits
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Load world and generate response
+        env:
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}  # Add your key as repo secret
+        run: |
+          python -c "
+          import json
+          from seed import initialize_world
+          from narrator import generate_response
+          
+          seed = 251121220823
+          world_file = 'world_251121220823.json'
+          
+          try:
+            with open(world_file, 'r') as f:
+              world = json.load(f)
+          except FileNotFoundError:
+            player_name = '${{ github.event.inputs.player_name }}'
+            world = initialize_world(seed, player_name)
+            with open(world_file, 'w') as f:
+              json.dump(world, f, indent=2)
+          
+          action = '${{ github.event.inputs.player_action }}'
+          response = generate_response(world, action)
+          
+          # Append to LOG.md
+          log_entry = f'## Turn {world[\"turn_count\"] + 1}\n**Action:** {action}\n**Response:** {response}\n\n'
+          with open('LOG.md', 'a') as f:
+            f.write(log_entry)
+          
+          # Update world (simple increment for demo; parse response for real changes)
+          world['turn_count'] += 1
+          with open(world_file, 'w') as f:
+            json.dump(world, f, indent=2)
+          
+          print('=== YOUR TURN ===')
+          print(response)
+          print('=================')
+          "
+
+      - name: Commit updates
+        run: |
+          git config user.name "GREYBRIGHT DOOR"
+          git config user.email "door@greybright.os"
+          git add world_251121220823.json LOG.md
+          git commit -m "Auto-save after turn: ${{ github.event.inputs.player_action }}" || echo "No changes"
+          git push
